@@ -22,7 +22,7 @@ bool NetworkHandler::SendData(char*data, int size)
 }
 
 
-bool NetworkHandler::RecvData()
+bool NetworkHandler::RecvData(char * Data)
 {
 	// TODO: Add your implementation code here.
 	return false;

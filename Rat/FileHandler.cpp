@@ -2,9 +2,10 @@
 #include "FileHandler.h"
 
 
-FileHandler::FileHandler(NetworkHandler NH)
+FileHandler::FileHandler(NetworkHandler * NH,int packetSize=512)
 {
-	NetHandle = &NH;
+	packSize = packetSize;
+	NetHandle = NH;
 }
 
 
@@ -15,25 +16,60 @@ FileHandler::~FileHandler()
 
 bool FileHandler::SendFile(string FilePath)
 {
+	int remainingBytes = getFileSize(FilePath);
+
 	ifstream File(FilePath, ifstream::in | ifstream::binary);
 
-	while (!File.eof()) {
-		vector<char> buffer;
-		File.read(buffer.data(), buffer.size());
-		NetHandle->SendData(buffer.data(),buffer.size());
-	}
+	string FileName;
 
-	return false;
+	NetHandle->SendData((char*)FileName.c_str(), sizeof((char*)FileName.c_str()));
+
+	NetHandle->SendData((char*)remainingBytes, sizeof(int));
+
+
+	//fix this and recv
+	while (remainingBytes>0) {
+		char * buffer;
+		File.read(buffer, packSize);
+		if (NetHandle->SendData((char*)packSize, sizeof(int))) {
+			if (!NetHandle->SendData(buffer, packSize)) {
+				return false;
+			}
+		}
+	}
+	return true;
 }
 
 
 vector<char> FileHandler::RecvFile()
 {
-	vector<char> buffer;
+	string FileName;
 
-	NetHandle->RecvData()
+	int FileSize = 0;
 
-	destination.write(buffer.data(), source.gcount());
+	NetHandle->RecvData((char*)FileName.c_str());
+
+	NetHandle->RecvData((char*)FileSize);
+
+	if (FileSize != 0) {
+		ofstream File(FileName, ifstream::out | ifstream::binary);
+
+		int fileSize = 0;
+
+		while (fileSize != FileSize) {
+
+			int PacketSize = 0;
+
+			NetHandle->RecvData((char*)PacketSize);
+
+			char * buffer;
+
+			NetHandle->RecvData(buffer);
+
+			File.write(buffer, PacketSize);
+		}
+		return true;
+	}
 	// TODO: Add your implementation code here.
 	return false;
 }

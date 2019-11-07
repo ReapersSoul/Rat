@@ -13,9 +13,10 @@ int getFileSize(const std::string &fileName);
 
 class FileHandler
 {
+	int packSize;
 	NetworkHandler * NetHandle;
 public:
-	FileHandler(NetworkHandler NH);
+	FileHandler(NetworkHandler * NH,int packetSize);
 	~FileHandler();
 	bool SendFile(string FilePath);
 	vector<char> RecvFile();
