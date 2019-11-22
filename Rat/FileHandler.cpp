@@ -14,34 +14,48 @@ FileHandler::~FileHandler()
 }
 
 
-bool FileHandler::SendFile(string FilePath)
+bool FileHandler::SendFile(string FilePath,string filename)
 {
 	int remainingBytes = getFileSize(FilePath);
 
 	ifstream File(FilePath, ifstream::in | ifstream::binary);
 
-	string FileName;
+	string FileName=filename;
 
 	NetHandle->SendData((char*)FileName.c_str(), sizeof((char*)FileName.c_str()));
 
 	NetHandle->SendData((char*)remainingBytes, sizeof(int));
 
 
-	//fix this and recv
-	while (remainingBytes>0) {
-		char * buffer;
-		File.read(buffer, packSize);
-		if (NetHandle->SendData((char*)packSize, sizeof(int))) {
-			if (!NetHandle->SendData(buffer, packSize)) {
-				return false;
+	//should work?
+	while (remainingBytes > 0) {
+		if (remainingBytes < packSize) {
+			vector<char> buffer;
+			buffer.resize(packSize);
+			File.read(buffer.data(), remainingBytes);
+			if (NetHandle->SendData((char*)remainingBytes, sizeof(int))) {
+				if (!NetHandle->SendData(buffer.data(), remainingBytes)) {
+					return false;
+				}
 			}
+			remainingBytes -= remainingBytes;
+		}
+		else {
+			vector<char> buffer;
+			File.read(buffer.data(), packSize);
+			if (NetHandle->SendData((char*)packSize, sizeof(int))) {
+				if (!NetHandle->SendData(buffer.data(), packSize)) {
+					return false;
+				}
+			}
+			remainingBytes -= packSize;
 		}
 	}
 	return true;
 }
 
 
-vector<char> FileHandler::RecvFile()
+bool FileHandler::RecvFile()
 {
 	string FileName;
 
@@ -62,15 +76,18 @@ vector<char> FileHandler::RecvFile()
 
 			NetHandle->RecvData((char*)PacketSize);
 
-			char * buffer;
+			char tmp;
+
+			char * buffer=&tmp;
 
 			NetHandle->RecvData(buffer);
 
 			File.write(buffer, PacketSize);
+
+			fileSize += PacketSize;
 		}
 		return true;
 	}
-	// TODO: Add your implementation code here.
 	return false;
 }
 

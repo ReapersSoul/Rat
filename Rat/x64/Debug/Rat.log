@@ -1,0 +1,4 @@
+﻿  Rat.cpp
+c:\users\trevor\desktop\github\rat\rat\rat.cpp(20): warning C4312: 'type cast': conversion from 'int' to 'char *' of greater size
+c:\users\trevor\desktop\github\rat\rat\rat.cpp(26): warning C4312: 'type cast': conversion from 'int' to 'char *' of greater size
+  Rat.vcxproj -> C:\Users\Trevor\Desktop\GitHub\Rat\x64\Debug\Rat.exe

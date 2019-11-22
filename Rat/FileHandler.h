@@ -1,6 +1,4 @@
 #pragma once
-
-#include <Windows.h>
 #include <iostream>
 #include <string.h>
 #include <fstream>
@@ -18,7 +16,7 @@ class FileHandler
 public:
 	FileHandler(NetworkHandler * NH,int packetSize);
 	~FileHandler();
-	bool SendFile(string FilePath);
-	vector<char> RecvFile();
+	bool SendFile(string FilePath, string filename);
+	bool RecvFile();
 };
 
